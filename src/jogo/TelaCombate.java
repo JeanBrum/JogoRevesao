@@ -12,7 +12,7 @@ import funcoes.*;
  * @author jonasdhein
  */
 public class TelaCombate extends javax.swing.JFrame {
-
+    boolean trocar = true;
     Personagem personagem;
     Inimigo inimigo;
     String[] inimigos = {"Godzilla", "Inimigo 2", "Inimigo Final"};
@@ -20,6 +20,7 @@ public class TelaCombate extends javax.swing.JFrame {
     
     public TelaCombate() {
         initComponents();
+        
         
         personagem = new Personagem();
         personagem.setNome("BudoTrader");
@@ -58,6 +59,14 @@ public class TelaCombate extends javax.swing.JFrame {
         }
         
     }
+    
+    private void gerarPersonagem(){
+        
+        personagem.setNome("BudoTrader");
+        personagem.setVida(100);
+        personagem.setAtaque(15);
+    }
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -79,6 +88,7 @@ public class TelaCombate extends javax.swing.JFrame {
         lblVidaInimigo = new javax.swing.JLabel();
         lblAtaqueInimigo = new javax.swing.JLabel();
         lblPersonagem4 = new javax.swing.JLabel();
+        lblInforma = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -109,14 +119,12 @@ public class TelaCombate extends javax.swing.JFrame {
 
         lblPersonagem4.setText("Ataque:");
 
+        lblInforma.setText("...");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(140, 140, 140)
-                .addComponent(btnAtacar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -141,6 +149,15 @@ public class TelaCombate extends javax.swing.JFrame {
                             .addComponent(lblVidaInimigo)
                             .addComponent(lblAtaqueInimigo))))
                 .addGap(44, 44, 44))
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(140, 140, 140)
+                        .addComponent(btnAtacar))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(77, 77, 77)
+                        .addComponent(lblInforma)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,7 +184,9 @@ public class TelaCombate extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lblPersonagem4)
                             .addComponent(lblAtaqueInimigo))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
+                .addGap(37, 37, 37)
+                .addComponent(lblInforma)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 42, Short.MAX_VALUE)
                 .addComponent(btnAtacar)
                 .addGap(23, 23, 23))
         );
@@ -176,16 +195,25 @@ public class TelaCombate extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAtacarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtacarActionPerformed
-        
+
         atacar();
         
         if(inimigo.getVida() <= 0){ //VERIFICA SE PRECISA GERAR OUTRO INIMIGO
             CaixaDeDialogo.obterinstancia().exibirMensagem("Inimigo derrotado, PARABÉNS!!!", 'i');
             gerarInimigo();
         }
+        else if (personagem.getVida() <= 0){
+            CaixaDeDialogo.obterinstancia().exibirMensagem("Seu personagem foi derrotado, tente novamente!");
+            gerarPersonagem();
+            inimigo.setNome(inimigo.getNome());
+            inimigo.setVida(200);
+            inimigo.setAtaque(30);
+            
+    }
         
         exibirPersonagem();
         exibirInimigo();
+        
     }//GEN-LAST:event_btnAtacarActionPerformed
 
     private void atacar(){
@@ -197,17 +225,26 @@ public class TelaCombate extends javax.swing.JFrame {
         4 = ataque + 10%
         5 = ataque * 2
         */
-        int dado = Funcoes.sortearNumero(5);
+        int dado = Funcoes.sortearNumero(8);
         if(dado == 1 || dado == 2){
             personagem.setVida(personagem.getVida() - inimigo.getAtaque());
+            lblInforma.setText("O inimigo " + inimigo.getNome() + " atacou!" + " Tirou " + inimigo.getAtaque() + " de vida!");
         }else if(dado == 3){
             inimigo.setVida(inimigo.getVida() - ataque);
+            lblInforma.setText(personagem.getNome() + " Atacou! " + "Tirou " + ataque + " de vida!");
         }else if(dado == 4){ //10% a mais
             vida = (int) (inimigo.getVida() - (ataque * 1.1));
             inimigo.setVida(vida);
-        }else{ //ataque x 2
+            lblInforma.setText(personagem.getNome() + " Atacou! " + "Tirou " + ataque * 1.1 + " de vida!");
+        }else if(dado == 5){ //ataque x 2
             inimigo.setVida(inimigo.getVida() - (ataque * 2));
             personagem.setAtaque((int) (ataque * 1.2));
+            lblInforma.setText(personagem.getNome() + " Atacou! " + "Tirou " + personagem.getAtaque() * 2 + " de vida!");
+        }else if(dado == 6 || dado == 7){
+            inimigo.setVida((int) (inimigo.getVida() - (personagem.getVida() * 1.5)));
+            lblInforma.setText(personagem.getNome() + " Atacou! " + "Tirou " + personagem.getVida() * 2 + " de vida!");
+        } else {
+            personagem.setVida(0);
         }
     }
     
@@ -250,6 +287,7 @@ public class TelaCombate extends javax.swing.JFrame {
     private javax.swing.JButton btnAtacar;
     private javax.swing.JLabel lblAtaqueInimigo;
     private javax.swing.JLabel lblAtaquePersonagem;
+    private javax.swing.JLabel lblInforma;
     private javax.swing.JLabel lblNomeInimigo;
     private javax.swing.JLabel lblNomePersonagem;
     private javax.swing.JLabel lblPersonagem1;
